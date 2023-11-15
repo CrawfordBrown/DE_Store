@@ -1,6 +1,6 @@
 package com.destore.data;
 
-import com.destore.model.Product;  // Add this import statement
+import com.destore.model.Product;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

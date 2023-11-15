@@ -1,4 +1,4 @@
-package com.destore;
+package com.destore.test;
 
 import com.destore.data.CustomerDAO;
 import com.destore.data.ProductDAO;
