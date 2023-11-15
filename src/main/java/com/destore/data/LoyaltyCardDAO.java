@@ -53,7 +53,7 @@ public class LoyaltyCardDAO {
 
     public void addLoyaltyCard(LoyaltyCard loyaltyCard) {
         try (Connection connection = ConnectionManager.getConnection()) {
-            String sql = "INSERT INTO loyalty_cards (customer_id, points, date) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO loyalty_cards (customer_id, points) VALUES (?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, loyaltyCard.getCustomerId());
                 statement.setInt(2, loyaltyCard.getPoints());
@@ -67,10 +67,10 @@ public class LoyaltyCardDAO {
 
     public void updateLoyaltyCard(LoyaltyCard loyaltyCard) {
         try (Connection connection = ConnectionManager.getConnection()) {
-            String sql = "UPDATE loyalty_cards SET points = ?, date = ? WHERE customer_id = ?";
+            String sql = "UPDATE loyalty_cards SET points = ? WHERE customer_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, loyaltyCard.getPoints());
-                statement.setInt(3, loyaltyCard.getCustomerId());
+                statement.setInt(2, loyaltyCard.getCustomerId());
                 statement.executeUpdate();
                 System.out.println("Loyalty Card updated in the database.");
             }
