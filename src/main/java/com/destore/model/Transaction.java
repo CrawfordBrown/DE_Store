@@ -5,9 +5,9 @@ import java.util.Date;
 public class Transaction {
     private int transactionId;
     private int customerId;
-    private int managerId;
-    private int productId;
-    private Date transactionDate;
+    private java.sql.Date transactionDate;
+    private double totalAmount;
+    private String status;
 
     public int getTransactionId() {
         return transactionId;
@@ -25,27 +25,28 @@ public class Transaction {
         this.customerId = customerId;
     }
 
-    public int getManagerId() {
-        return managerId;
-    }
-
-    public void setManagerId(int managerId) {
-        this.managerId = managerId;
-    }
-
-    public int getProductId() {
-        return productId;
-    }
-
-    public void setProductId(int productId) {
-        this.productId = productId;
-    }
-
-    public Date getTransactionDate() {
+    public java.sql.Date getTransactionDate() {
         return transactionDate;
     }
 
     public void setTransactionDate(Date transactionDate) {
-        this.transactionDate = transactionDate;
+        this.transactionDate = (java.sql.Date) transactionDate;
     }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 }
