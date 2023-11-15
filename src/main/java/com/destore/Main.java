@@ -5,5 +5,5 @@ import com.destore.model.Product;
 
 public class Main {
 
-   
+
 }

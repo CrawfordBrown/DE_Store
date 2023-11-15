@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import com.destore.model.Customer;
 
 public class CustomerDAO {
-    public void createCustomer(Customer customer) {
+    public void addCustomer(Customer customer) {
         try (Connection connection = ConnectionManager.getConnection()) {
             String sql = "INSERT INTO customers (name) VALUES (?)";
             try (PreparedStatement statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -75,6 +75,7 @@ public class CustomerDAO {
                 statement.setInt(1, customerId);
                 int rowsAffected = statement.executeUpdate();
                 return rowsAffected > 0;
+
             }
         } catch (SQLException e) {
             e.printStackTrace();

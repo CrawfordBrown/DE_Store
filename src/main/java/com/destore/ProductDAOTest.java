@@ -7,13 +7,13 @@ public class ProductDAOTest {
 
 
     public static void main(String[] args) {
-        testRetrieveProduct();
+        testGetProductById();
         testAddProduct();
         testUpdateProduct();
         //testDeleteProduct();
     }
 
-    private static void testRetrieveProduct() {
+    private static void testGetProductById() {
         ProductDAO productDAO = new ProductDAO();
         int productId = 1;
         Product product = productDAO.getProductById(productId);
