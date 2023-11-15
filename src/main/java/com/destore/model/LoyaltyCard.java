@@ -6,7 +6,6 @@ public class LoyaltyCard {
     private int loyaltyCardId;
     private int customerId;
     private int points;
-    private Date date;
 
     public int getLoyaltyCardId() {
         return loyaltyCardId;
@@ -32,11 +31,4 @@ public class LoyaltyCard {
         this.points = points;
     }
 
-    public java.sql.Date getDate() {
-        return (java.sql.Date) date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
 }

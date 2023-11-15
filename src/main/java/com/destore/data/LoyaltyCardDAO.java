@@ -21,7 +21,6 @@ public class LoyaltyCardDAO {
                         LoyaltyCard loyaltyCard = new LoyaltyCard();
                         loyaltyCard.setCustomerId(resultSet.getInt("customer_id"));
                         loyaltyCard.setPoints(resultSet.getInt("points"));
-                        loyaltyCard.setDate(resultSet.getDate("date"));
                         return loyaltyCard;
                     }
                 }
@@ -42,7 +41,6 @@ public class LoyaltyCardDAO {
                         LoyaltyCard loyaltyCard = new LoyaltyCard();
                         loyaltyCard.setCustomerId(resultSet.getInt("customer_id"));
                         loyaltyCard.setPoints(resultSet.getInt("points"));
-                        loyaltyCard.setDate(resultSet.getDate("date"));
                         loyaltyCards.add(loyaltyCard);
                     }
                 }
@@ -59,7 +57,6 @@ public class LoyaltyCardDAO {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, loyaltyCard.getCustomerId());
                 statement.setInt(2, loyaltyCard.getPoints());
-                statement.setDate(3, loyaltyCard.getDate());
                 statement.executeUpdate();
                 System.out.println("Loyalty Card added to the database.");
             }
@@ -73,7 +70,6 @@ public class LoyaltyCardDAO {
             String sql = "UPDATE loyalty_cards SET points = ?, date = ? WHERE customer_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, loyaltyCard.getPoints());
-                statement.setDate(2, loyaltyCard.getDate());
                 statement.setInt(3, loyaltyCard.getCustomerId());
                 statement.executeUpdate();
                 System.out.println("Loyalty Card updated in the database.");
