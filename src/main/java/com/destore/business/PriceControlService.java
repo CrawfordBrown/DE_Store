@@ -3,6 +3,7 @@ package com.destore.business;
 import com.destore.data.ProductDAO;
 import com.destore.data.InventoryDAO;
 import com.destore.model.Product;
+import com.destore.model.ProductEntry;
 import com.destore.model.ShoppingCart;
 
 
@@ -30,60 +31,40 @@ public class PriceControlService {
         } else {
             System.out.println("Product not found for ID: " + productId);
         }
+
+    }
+    public void apply3For2Offer(ShoppingCart shoppingCart) {
+        for (ProductEntry entry : shoppingCart.getProductEntries()) {
+            int quantity = entry.getQuantity();
+            int freeItems = quantity / 3;
+
+            // Ensure there are enough items for the offer
+            if (freeItems > 0) {
+                double originalPrice = entry.getProduct().getPrice();
+                double discountedPrice = (quantity - freeItems) * originalPrice / quantity;
+
+                // Update the product's price with the discounted price
+                entry.getProduct().setPrice(discountedPrice);
+
+                System.out.println("3-for-2 offer applied for product: " + entry.getProduct().getName());
+            } else {
+                System.out.println("Not enough quantity for 3-for-2 offer for product: " + entry.getProduct().getName());
+            }
+        }
     }
 
-//    public void applySaleOffer(int productId, String offerType) {
-//        // Retrieve the product from the shopping cart
-//        Product product = shoppingCart.getProductById(productId);
-//
-//        if (product != null) {
-//            // Apply the sale offer based on the offerType
-//            switch (offerType.toLowerCase()) {
-//                case "3for2":
-//                    apply3For2Offer(product);
-//                    break;
-//                case "buyonegetonefree":
-//                    applyBuyOneGetOneFreeOffer(product);
-//                    break;
-//
-//                default:
-//                    System.out.println("Invalid offer type: " + offerType);
-//            }
-//
-//            System.out.println("Sale offer applied successfully for product ID: " + productId);
-//        } else {
-//            System.out.println("Product not found in the shopping cart for ID: " + productId);
-//        }
-//    }
-//
-//    private void apply3For2Offer(Product product) {
-//        // Implement 3 for 2 offer logic
-//        int quantityInCart = shoppingCart.getProductQuantity(product);
-//        int freeItems = quantityInCart / 3;
-//
-//        // Ensure there are enough items for the offer
-//        if (freeItems > 0) {
-//            double originalPrice = product.getPrice();
-//            double discountedPrice = (quantityInCart - freeItems) * originalPrice / quantityInCart;
-//
-//            // Update the product's price in the shopping cart
-//            product.setPrice(discountedPrice);
-//
-//            System.out.println("3-for-2 offer applied. Price set to: " + discountedPrice);
-//        } else {
-//            System.out.println("Not enough quantity for 3-for-2 offer.");
-//        }
-//    }
-//
-//    private void applyBuyOneGetOneFreeOffer(Product product) {
-//        // Implement buy one get one free offer logic
-//        int quantityInCart = shoppingCart.getProductQuantity(product);
-//        int freeItems = quantityInCart / 2;
-//
-//        double originalPrice = product.getPrice();
-//        double discountedPrice = (quantityInCart - freeItems) * originalPrice / quantityInCart;
-//
-//        // Update the product's price in the shopping cart
-//        product.setPrice(discountedPrice);
-//    }
+    public void applyBuyOneGetOneFreeOffer(ShoppingCart shoppingCart) {
+        for (ProductEntry entry : shoppingCart.getProductEntries()) {
+            int quantity = entry.getQuantity();
+            int freeItems = quantity / 2;
+
+            double originalPrice = entry.getProduct().getPrice();
+            double discountedPrice = (quantity - freeItems) * originalPrice / quantity;
+
+            // Update the product's price with the discounted price
+            entry.getProduct().setPrice(discountedPrice);
+
+            System.out.println("Buy one get one free offer applied for product: " + entry.getProduct().getName());
+        }
+    }
 }
