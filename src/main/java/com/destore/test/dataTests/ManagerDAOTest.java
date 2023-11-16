@@ -1,4 +1,4 @@
-package com.destore.test;
+package com.destore.test.dataTests;
 
 import com.destore.data.ManagerDAO;
 import com.destore.model.Manager;
