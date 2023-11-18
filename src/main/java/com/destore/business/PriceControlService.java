@@ -7,7 +7,7 @@ import com.destore.model.ProductEntry;
 import com.destore.model.ShoppingCart;
 
 
-public class PriceControlService {
+public class PriceControlService implements iPriceControlService {
     private final ProductDAO productDAO;
     private final ShoppingCart shoppingCart;
 
