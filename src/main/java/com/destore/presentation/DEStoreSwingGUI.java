@@ -84,7 +84,6 @@ public class DEStoreSwingGUI {
         panel.removeAll();
         panel.setLayout(null);
 
-        // Add your main content components here
 
         // For example, let's add a button to open the Price Control window
         JButton priceControlButton = new JButton("Price Control");

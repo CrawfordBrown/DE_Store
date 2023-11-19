@@ -5,6 +5,7 @@ public class Manager {
     private String name;
     private String email;
     private String password;
+    private String role;
 
     public int getManagerId() {
         return managerId;
@@ -36,5 +37,13 @@ public class Manager {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

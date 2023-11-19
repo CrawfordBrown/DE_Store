@@ -74,5 +74,23 @@ public class InventoryDAO {
         }
         return false;
     }
+
+    // Get the quantity of a product in the inventory
+    public int getInventoryQuantity(int productId) {
+        try (Connection connection = ConnectionManager.getConnection()) {
+            String sql = "SELECT quantity FROM inventory WHERE product_id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, productId);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt("quantity");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0; // Return 0 if the product is not found in the inventory
+    }
 }
 

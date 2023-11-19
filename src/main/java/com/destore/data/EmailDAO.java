@@ -15,7 +15,7 @@ public class EmailDAO {
         List<Email> emails = new ArrayList<>();
 
         try (Connection connection = ConnectionManager.getConnection()) {
-            String sql = "SELECT * FROM emails WHERE manager_id = ?";
+            String sql = "SELECT * FROM email WHERE manager_id = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, managerId);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -38,7 +38,7 @@ public class EmailDAO {
 
     public void addEmail(Email email) {
         try (Connection connection = ConnectionManager.getConnection()) {
-            String sql = "INSERT INTO emails (manager_id, email_address, email_message) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO email (manager_id, email_address, email_message) VALUES (?, ?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, email.getManager_id());
                 statement.setString(2, email.getEmail_Address());
@@ -48,6 +48,23 @@ public class EmailDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int getManagerIdByEmail(String email) {
+        try (Connection connection = ConnectionManager.getConnection()) {
+            String sql = "SELECT manager_id FROM managers WHERE email = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, email);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt("manager_id");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Return -1 or any value indicating failure
     }
 
 }

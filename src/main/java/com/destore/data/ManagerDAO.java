@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ManagerDAO {
 
@@ -114,6 +116,33 @@ public class ManagerDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Method to retrieve managers by role
+    public List<Manager> getManagersByRole(String role) {
+        List<Manager> managers = new ArrayList<>();
+
+        try (Connection connection = ConnectionManager.getConnection()) {
+            String sql = "SELECT * FROM managers WHERE role = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, role);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        Manager manager = new Manager();
+                        manager.setManagerId(resultSet.getInt("manager_id"));
+                        manager.setName(resultSet.getString("name"));
+                        manager.setEmail(resultSet.getString("email"));
+                        // Add other manager properties as needed
+                        managers.add(manager);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return managers;
     }
 }
 

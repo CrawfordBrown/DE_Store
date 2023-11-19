@@ -22,7 +22,6 @@ public class PriceControlServiceTest {
 
     @BeforeEach
     public void setUp() {
-        ProductDAO mockProductDAO = new ProductDAO(); // Assuming you have a MockProductDAO class
         ShoppingCart shoppingCart = new ShoppingCart(new Customer());
         priceControlService = new PriceControlService(mockProductDAO, shoppingCart);
     }
