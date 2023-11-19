@@ -76,4 +76,44 @@ public class ManagerDAO {
         }
         return false;
     }
+
+    public Manager getManagerByEmail(String email) {
+        try (Connection connection = ConnectionManager.getConnection()) {
+            String sql = "SELECT * FROM managers WHERE email = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, email);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        Manager manager = new Manager();
+                        manager.setManagerId(resultSet.getInt("manager_id"));
+                        manager.setEmail(resultSet.getString("email"));
+                        manager.setPassword(resultSet.getString("password"));
+                        // Add other manager properties as needed
+                        return manager;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String getPassword(String email) {
+        try (Connection connection = ConnectionManager.getConnection()) {
+            String sql = "SELECT password FROM managers WHERE email = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, email);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getString("password");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
+

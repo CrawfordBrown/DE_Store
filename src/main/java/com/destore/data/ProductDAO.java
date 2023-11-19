@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductDAO {
     public Product getProductById(int productId) {
@@ -96,6 +98,29 @@ public class ProductDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public List<Product> getAllProducts() {
+        List<Product> productList = new ArrayList<>();
+
+        try (Connection connection = ConnectionManager.getConnection()) {
+            String sql = "SELECT * FROM products";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        Product product = new Product();
+                        product.setId(resultSet.getInt("product_id"));
+                        product.setName(resultSet.getString("name"));
+                        product.setPrice(resultSet.getDouble("price"));
+                        productList.add(product);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return productList;
     }
 }
 
