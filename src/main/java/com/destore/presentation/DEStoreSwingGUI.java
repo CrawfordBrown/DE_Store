@@ -233,14 +233,14 @@ public class DEStoreSwingGUI {
 
 
     private void handleCheckStock() {
-        // Code to handle checking stock goes here
-        // You can call the corresponding method in your inventory controller
-        // For example:
-        // inventoryController.checkStock();
-        // Display a message or show a popup based on the result
-        // For example:
-        // JOptionPane.showMessageDialog(panel, "Stock is low. Email sent to store manager.");
+
+        inventoryController.checkStock();
+
+        // Display a message to inform the user that the stock check is complete
+        JOptionPane.showMessageDialog(panel, "Stock check complete. Low stock alerts sent to store managers.");
+
     }
+
 
     public static void main(String[] args) {
         // The main method remains the same
