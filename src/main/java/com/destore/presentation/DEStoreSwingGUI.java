@@ -1,7 +1,10 @@
 package com.destore.presentation;
 
+import com.destore.application.InventoryController;
 import com.destore.application.PriceControlController;
+import com.destore.business.InventoryService;
 import com.destore.business.PriceControlService;
+import com.destore.data.InventoryDAO;
 import com.destore.data.ProductDAO;
 import com.destore.data.ManagerDAO;
 import com.destore.model.Customer;
@@ -13,12 +16,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class DEStoreSwingGUI {
+    private InventoryController inventoryController;
     private PriceControlController priceControlController;
     private JFrame frame;
     private JPanel panel;
 
-    public DEStoreSwingGUI(PriceControlController priceControlController) {
+    public DEStoreSwingGUI(PriceControlController priceControlController, InventoryController inventoryController) {
         this.priceControlController = priceControlController;
+        this.inventoryController = inventoryController;
 
         // Initialize and set up your main JFrame
         frame = new JFrame("DE-Store");
@@ -96,8 +101,16 @@ public class DEStoreSwingGUI {
         });
         panel.add(priceControlButton);
 
-        // Add other main content components as needed
-    }
+        // Button to open the Inventory window
+        JButton inventoryButton = new JButton("Inventory");
+        inventoryButton.setBounds(140, 20, 120, 25);
+        inventoryButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openInventoryWindow();
+            }
+        });
+        panel.add(inventoryButton);    }
 
     private boolean isValidLogin(String email, String password) {
         // Replace this with actual authentication logic
@@ -154,14 +167,97 @@ public class DEStoreSwingGUI {
         priceControlFrame.setVisible(true);
     }
 
+    private void openInventoryWindow() {
+        JFrame inventoryFrame = new JFrame("Inventory");
+        inventoryFrame.setSize(300, 200);
+
+        JPanel inventoryPanel = new JPanel();
+        inventoryFrame.getContentPane().add(inventoryPanel);
+
+        // Call the method to set up components for Inventory functionality
+        placeInventoryComponents(inventoryPanel);
+
+        inventoryFrame.setVisible(true);
+    }
+
+    private void placeInventoryComponents(JPanel panel) {
+        panel.setLayout(null);
+
+        JButton addProductButton = new JButton("Add Stock");
+        addProductButton.setBounds(10, 20, 120, 25);
+        addProductButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Call a method to handle adding a product
+                handleAddProduct();
+            }
+        });
+        panel.add(addProductButton);
+
+        JButton checkStockButton = new JButton("Check Stock");
+        checkStockButton.setBounds(140, 20, 120, 25);
+        checkStockButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Call a method to handle checking stock
+                handleCheckStock();
+            }
+        });
+        panel.add(checkStockButton);
+
+    }
+
+    private void handleAddProduct() {
+        // Prompt the user for Product ID and Quantity using JOptionPane
+        String productIdString = JOptionPane.showInputDialog("Enter Product ID:");
+        String quantityString = JOptionPane.showInputDialog("Enter Quantity:");
+
+        // Check if the user clicked "Cancel" or closed the dialog
+        if (productIdString != null && quantityString != null) {
+            try {
+                // Parse the input values to integers
+                int productId = Integer.parseInt(productIdString);
+                int quantity = Integer.parseInt(quantityString);
+
+                // Call the corresponding method in your inventory controller
+                inventoryController.addToInventory(productId, quantity);
+
+                // Display a success message
+                JOptionPane.showMessageDialog(panel, "Product added to inventory successfully!");
+            } catch (NumberFormatException e) {
+                // Handle the case where the input is not a valid number
+                JOptionPane.showMessageDialog(panel, "Invalid input. Please enter valid numbers for Product ID and Quantity.");
+            }
+        }
+    }
+
+
+    private void handleCheckStock() {
+        // Code to handle checking stock goes here
+        // You can call the corresponding method in your inventory controller
+        // For example:
+        // inventoryController.checkStock();
+        // Display a message or show a popup based on the result
+        // For example:
+        // JOptionPane.showMessageDialog(panel, "Stock is low. Email sent to store manager.");
+    }
+
     public static void main(String[] args) {
         // The main method remains the same
         Customer customer = new Customer();
         ProductDAO productDAO = new ProductDAO();
         ShoppingCart shoppingCart = new ShoppingCart(customer);
+        InventoryDAO inventoryDAO = new InventoryDAO();
+        ManagerDAO managerDAO = new ManagerDAO();
+
+
         PriceControlService priceControlService = new PriceControlService(productDAO, shoppingCart);
         PriceControlController priceControlController = new PriceControlController(priceControlService);
 
-        SwingUtilities.invokeLater(() -> new DEStoreSwingGUI(priceControlController));
+        InventoryService inventoryService = new InventoryService(productDAO, inventoryDAO, managerDAO);
+        InventoryController inventoryController = new InventoryController(inventoryService);
+
+
+        SwingUtilities.invokeLater(() -> new DEStoreSwingGUI(priceControlController, inventoryController));
     }
 }
