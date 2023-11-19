@@ -14,12 +14,16 @@ import com.destore.model.Manager;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DEStoreSwingGUI {
     private InventoryController inventoryController;
     private PriceControlController priceControlController;
+    private int loggedInManagerId;
     private JFrame frame;
     private JPanel panel;
+
 
     public DEStoreSwingGUI(PriceControlController priceControlController, InventoryController inventoryController) {
         this.priceControlController = priceControlController;
@@ -73,12 +77,18 @@ public class DEStoreSwingGUI {
                 String password = new String(passwordChars);
 
                 if (isValidLogin(email, password)) {
-                    // Successful login, show main content
+                    // Successful login, store the manager's ID
+                    ManagerDAO managerDAO = new ManagerDAO();
+                    Manager manager = managerDAO.getManagerByEmail(email);
+                    loggedInManagerId = manager.getManagerId();
+
+                    // Show main content
                     showMainContent();
                 } else {
                     // Failed login, show error message
                     JOptionPane.showMessageDialog(panel, "Invalid email or password. Try again.");
                 }
+
             }
         });
         panel.add(loginButton);
@@ -110,15 +120,81 @@ public class DEStoreSwingGUI {
                 openInventoryWindow();
             }
         });
-        panel.add(inventoryButton);    }
+        panel.add(inventoryButton);
+
+        // Add the email button
+       JButton emailButton = new JButton("Emails");
+        emailButton.setBounds(140, 80, 120, 25);
+        emailButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Call the method to handle opening the email window
+                openEmailWindow();
+            }
+        });
+        panel.add(emailButton);
+
+
+    // Add the logout button
+        JButton  logoutButton = new JButton("Logout");
+        logoutButton.setBounds(270, 80, 120, 25);
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Call the method to handle logout
+                handleLogout();
+            }
+        });
+        panel.add(logoutButton);
+
+
+    }
+
+    private void openEmailWindow() {
+        // Create a new JFrame for the email window
+        JFrame emailFrame = new JFrame("Emails");
+        emailFrame.setSize(300, 200);
+
+        // Create a panel for the email window
+        JPanel emailPanel = new JPanel();
+        emailFrame.getContentPane().add(emailPanel);
+
+        // Call the method to set up components for displaying emails
+        placeEmailComponents(emailPanel);
+
+        emailFrame.setVisible(true);
+    }
+
+    private void placeEmailComponents(JPanel panel) {
+        JTextArea emailTextArea = new JTextArea("List of Emails\n\n");
+        List<String> emails = getEmailsForLoggedInUser(loggedInManagerId);
+        for (String email : emails) {
+            emailTextArea.append(email + "\n\n\n\n\n\n\n\n");
+        }
+        emailTextArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(emailTextArea);
+        scrollPane.setBounds(10, 20, 260, 120);
+        panel.add(scrollPane);
+    }
+
+
+    private List<String> getEmailsForLoggedInUser(int managerId) {
+        ManagerDAO managerDAO = new ManagerDAO();
+        return managerDAO.getEmailsByManagerId(managerId);
+    }
+
 
     private boolean isValidLogin(String email, String password) {
-        // Replace this with actual authentication logic
+
         ManagerDAO managerDAO = new ManagerDAO();
         Manager manager = managerDAO.getManagerByEmail(email);
 
-        return manager != null && manager.getPassword().equals(password);
-    }
+        if (manager != null && manager.getPassword().equals(password)) {
+            loggedInManagerId = manager.getManagerId(); // Set the logged-in manager's ID
+            return true;
+        } else {
+            return false;
+        }    }
     private void placePriceControlComponents(JPanel panel) {
         panel.setLayout(null);
 
@@ -151,7 +227,6 @@ public class DEStoreSwingGUI {
         });
         panel.add(setPriceButton);
 
-        // Add more components and actions as needed for Price Control functionality
     }
     private void openPriceControlWindow() {
 
@@ -239,6 +314,12 @@ public class DEStoreSwingGUI {
         // Display a message to inform the user that the stock check is complete
         JOptionPane.showMessageDialog(panel, "Stock check complete. Low stock alerts sent to store managers.");
 
+    }
+
+
+    private void handleLogout() {
+        // Clear the main panel and show the login page
+        showLoginPage();
     }
 
 

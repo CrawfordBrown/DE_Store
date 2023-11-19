@@ -2,10 +2,7 @@ package com.destore.data;
 
 import com.destore.model.Manager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,6 +140,29 @@ public class ManagerDAO {
         }
 
         return managers;
+    }
+
+    public List<String> getEmailsByManagerId(int managerId) {
+
+        List<String> emails = new ArrayList<>();
+
+        try (Connection connection = ConnectionManager.getConnection())  {
+            String query = "SELECT email_message FROM email WHERE manager_id = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, managerId);
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        String email = resultSet.getString("email_message");
+                        emails.add(email);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception appropriately in your application
+        }
+
+        return emails;
     }
 }
 
