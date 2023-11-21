@@ -1,13 +1,16 @@
 package com.destore.presentation;
 
 import com.destore.application.InventoryController;
+import com.destore.application.LoyaltyCardController;
 import com.destore.application.PriceControlController;
+import com.destore.application.iLoyaltyCardController;
+import com.destore.business.CustomerService;
 import com.destore.business.InventoryService;
+import com.destore.business.LoyaltyCardService;
 import com.destore.business.PriceControlService;
-import com.destore.data.InventoryDAO;
-import com.destore.data.ProductDAO;
-import com.destore.data.ManagerDAO;
+import com.destore.data.*;
 import com.destore.model.Customer;
+import com.destore.model.LoyaltyCard;
 import com.destore.model.ShoppingCart;
 import com.destore.model.Manager;
 
@@ -18,17 +21,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DEStoreSwingGUI {
+    private CustomerService customerService;
     private InventoryController inventoryController;
     private PriceControlController priceControlController;
+    private LoyaltyCardController loyaltyCardController;
+    private static LoyaltyCardService loyaltyCardService;
     private int loggedInManagerId;
     private JFrame frame;
     private JPanel panel;
 
 
-    public DEStoreSwingGUI(PriceControlController priceControlController, InventoryController inventoryController) {
+    public DEStoreSwingGUI(PriceControlController priceControlController, InventoryController inventoryController, CustomerService customerService, LoyaltyCardController loyaltyCardController) {
         this.priceControlController = priceControlController;
         this.inventoryController = inventoryController;
+        this.customerService = customerService;
+        this.loyaltyCardController = loyaltyCardController;
 
+        this.loyaltyCardService = new LoyaltyCardService(new LoyaltyCardDAO());
         // Initialize and set up your main JFrame
         frame = new JFrame("DE-Store");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -134,6 +143,16 @@ public class DEStoreSwingGUI {
         });
         panel.add(emailButton);
 
+        // Button to open the Loyalty Card window
+        JButton loyaltyCardButton = new JButton("Loyalty Card");
+        loyaltyCardButton.setBounds(270, 20, 120, 25);
+        loyaltyCardButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openLoyaltyCardWindow();
+            }
+        });
+        panel.add(loyaltyCardButton);
 
     // Add the logout button
         JButton  logoutButton = new JButton("Logout");
@@ -316,10 +335,66 @@ public class DEStoreSwingGUI {
 
     }
 
+    private void openLoyaltyCardWindow() {
+        // Create a new JFrame for the Loyalty Card window
+        JFrame loyaltyCardFrame = new JFrame("Loyalty Card");
+        loyaltyCardFrame.setSize(400, 300);
+
+        // Create a panel for the Loyalty Card window
+        JPanel loyaltyCardPanel = new JPanel();
+        loyaltyCardFrame.getContentPane().add(loyaltyCardPanel);
+
+        // Call the method to set up components for displaying Loyalty Cards
+        placeLoyaltyCardComponents(loyaltyCardPanel);
+
+        loyaltyCardFrame.setVisible(true);
+    }
+
+    private void placeLoyaltyCardComponents(JPanel panel) {
+        // Call the Loyalty Card service to get a list of Loyalty Cards
+        List<LoyaltyCard> loyaltyCards = loyaltyCardService.getAllLoyaltyCards();
+
+        // Create a table to display Loyalty Cards
+        String[] columnNames = {"Customer ID", "Name", "Loyalty Points", "2for1", "3for2"};
+        Object[][] data = new Object[loyaltyCards.size()][5];
+
+        for (int i = 0; i < loyaltyCards.size(); i++) {
+            LoyaltyCard loyaltyCard = loyaltyCards.get(i);
+            data[i][0] = loyaltyCard.getCustomerId();
+            data[i][1] = getCustomerNameById(loyaltyCard.getCustomerId());
+            data[i][2] = loyaltyCard.getPoints();
+
+            // Check if 2for1 is applied
+            boolean is2For1Applied = loyaltyCardController.applyBOGOF(loyaltyCard.getPoints());
+            data[i][3] = is2For1Applied ? "Applied" : "Not Applied";
+
+            // Check if 3for2 is applied
+            boolean is3For2Applied = loyaltyCardController.apply3For2(loyaltyCard.getPoints());
+            data[i][4] = is3For2Applied ? "Applied" : "Not Applied";
+        }
+
+
+        JTable table = new JTable(data, columnNames);
+        JScrollPane scrollPane = new JScrollPane(table);
+        panel.add(scrollPane);
+    }
+
+    private String getCustomerNameById(int customerId) {
+        // Call the Customer service to get the customer by ID
+        Customer customer = customerService.getCustomerById(customerId);
+
+        // Return the customer name
+        return (customer != null) ? customer.getName() : "Unknown";
+    }
+
+
 
     private void handleLogout() {
+
         // Clear the main panel and show the login page
         showLoginPage();
+
+
     }
 
 
@@ -330,6 +405,10 @@ public class DEStoreSwingGUI {
         ShoppingCart shoppingCart = new ShoppingCart(customer);
         InventoryDAO inventoryDAO = new InventoryDAO();
         ManagerDAO managerDAO = new ManagerDAO();
+        LoyaltyCardDAO loyaltyCardDAO = new LoyaltyCardDAO();
+        CustomerDAO customerDAO = new CustomerDAO(); //
+        CustomerService customerService = new CustomerService(customerDAO);
+
 
 
         PriceControlService priceControlService = new PriceControlService(productDAO, shoppingCart);
@@ -337,8 +416,9 @@ public class DEStoreSwingGUI {
 
         InventoryService inventoryService = new InventoryService(productDAO, inventoryDAO, managerDAO);
         InventoryController inventoryController = new InventoryController(inventoryService);
+        LoyaltyCardController loyaltyCardController = new LoyaltyCardController(loyaltyCardDAO);
 
 
-        SwingUtilities.invokeLater(() -> new DEStoreSwingGUI(priceControlController, inventoryController));
+        SwingUtilities.invokeLater(() -> new DEStoreSwingGUI(priceControlController, inventoryController, customerService, loyaltyCardController));
     }
 }

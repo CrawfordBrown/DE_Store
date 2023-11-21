@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.destore.model.Customer;
 
 public class CustomerDAO {
@@ -81,6 +84,27 @@ public class CustomerDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<Customer> getAllCustomers() {
+        List<Customer> customers = new ArrayList<>();
+        try (Connection connection = ConnectionManager.getConnection()) {
+            String sql = "SELECT * FROM customers";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        Customer customer = new Customer();
+                        customer.setCustomerId(resultSet.getInt("customer_id"));
+                        customer.setName(resultSet.getString("name"));
+                        // Set other attributes
+                        customers.add(customer);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return customers;
     }
 }
 

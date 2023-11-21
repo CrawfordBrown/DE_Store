@@ -74,7 +74,6 @@ public class InventoryService implements iInventoryService {
         // Update the email table in the database
         EmailDAO emailDAO = new EmailDAO();
 
-        // Assuming you have a manager ID associated with the email, you might need to retrieve it
         int managerId = emailDAO.getManagerIdByEmail(email);
 
         // Create an Email object
