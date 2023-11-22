@@ -9,9 +9,7 @@ import java.util.List;
 public class LoyaltyCardController implements iLoyaltyCardController {
     private final LoyaltyCardService loyaltyCardService;
 
-    public LoyaltyCardController(LoyaltyCardService loyaltyCardService) {
-        this.loyaltyCardService = loyaltyCardService;
-    }
+
     public LoyaltyCardController(LoyaltyCardDAO loyaltyCardDAO) {
         this.loyaltyCardService = new LoyaltyCardService(loyaltyCardDAO);
     }

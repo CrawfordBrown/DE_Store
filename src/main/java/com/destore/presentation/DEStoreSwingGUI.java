@@ -1,20 +1,15 @@
 package com.destore.presentation;
 
-import com.destore.application.InventoryController;
-import com.destore.application.LoyaltyCardController;
-import com.destore.application.PriceControlController;
-import com.destore.application.iLoyaltyCardController;
+import com.destore.application.*;
 import com.destore.business.CustomerService;
 import com.destore.business.InventoryService;
 import com.destore.business.LoyaltyCardService;
 import com.destore.business.PriceControlService;
 import com.destore.data.*;
-import com.destore.model.Customer;
-import com.destore.model.LoyaltyCard;
-import com.destore.model.ShoppingCart;
-import com.destore.model.Manager;
+import com.destore.model.*;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -25,17 +20,19 @@ public class DEStoreSwingGUI {
     private InventoryController inventoryController;
     private PriceControlController priceControlController;
     private LoyaltyCardController loyaltyCardController;
+    private TransactionController transactionController;
     private static LoyaltyCardService loyaltyCardService;
     private int loggedInManagerId;
     private JFrame frame;
     private JPanel panel;
 
 
-    public DEStoreSwingGUI(PriceControlController priceControlController, InventoryController inventoryController, CustomerService customerService, LoyaltyCardController loyaltyCardController) {
+    public DEStoreSwingGUI(PriceControlController priceControlController, InventoryController inventoryController, CustomerService customerService, LoyaltyCardController loyaltyCardController, TransactionController transactionController) {
         this.priceControlController = priceControlController;
         this.inventoryController = inventoryController;
         this.customerService = customerService;
         this.loyaltyCardController = loyaltyCardController;
+        this.transactionController = transactionController;
 
         this.loyaltyCardService = new LoyaltyCardService(new LoyaltyCardDAO());
         // Initialize and set up your main JFrame
@@ -109,7 +106,7 @@ public class DEStoreSwingGUI {
         panel.setLayout(null);
 
 
-        // For example, let's add a button to open the Price Control window
+        //  Price Control button
         JButton priceControlButton = new JButton("Price Control");
         priceControlButton.setBounds(10, 20, 120, 25);
         priceControlButton.addActionListener(new ActionListener() {
@@ -133,7 +130,7 @@ public class DEStoreSwingGUI {
 
         // Add the email button
        JButton emailButton = new JButton("Emails");
-        emailButton.setBounds(140, 80, 120, 25);
+        emailButton.setBounds(270, 20, 120, 25);
         emailButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -145,7 +142,7 @@ public class DEStoreSwingGUI {
 
         // Button to open the Loyalty Card window
         JButton loyaltyCardButton = new JButton("Loyalty Card");
-        loyaltyCardButton.setBounds(270, 20, 120, 25);
+        loyaltyCardButton.setBounds(400, 20, 120, 25);
         loyaltyCardButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -154,9 +151,31 @@ public class DEStoreSwingGUI {
         });
         panel.add(loyaltyCardButton);
 
-    // Add the logout button
+        //finance approval button
+        JButton financeApprovalButton = new JButton("Finance Approval");
+        financeApprovalButton.setBounds(530, 20, 120, 25);
+        financeApprovalButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openFinanceApprovalWindow();
+            }
+        });
+        panel.add(financeApprovalButton);
+
+    // Add the report and analysis button
+        JButton  reportButton = new JButton("Report");
+        reportButton.setBounds(660, 20, 120, 25);
+        reportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openReportWindow();
+            }
+        });
+        panel.add(reportButton);
+
+        // Add the logout button
         JButton  logoutButton = new JButton("Logout");
-        logoutButton.setBounds(270, 80, 120, 25);
+        logoutButton.setBounds(790, 20, 120, 25);
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -387,6 +406,81 @@ public class DEStoreSwingGUI {
         return (customer != null) ? customer.getName() : "Unknown";
     }
 
+    private void openFinanceApprovalWindow() {
+        JFrame financeWindow = new JFrame("Finance Approval");
+        financeWindow.setSize(300, 150);
+
+        JPanel financePanel = new JPanel();
+        JLabel customerIdLabel = new JLabel("Enter Customer ID:");
+        JTextField customerIdField = new JTextField(10);
+        JButton okButton = new JButton("OK");
+
+        okButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String customerId = customerIdField.getText();
+                if (!customerId.isEmpty()) {
+                    financeWindow.dispose(); // Close the window after OK is clicked
+                    showApprovalMessage(Integer.parseInt(customerId));
+                } else {
+                    JOptionPane.showMessageDialog(financeWindow, "Please enter a Customer ID", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        financePanel.add(customerIdLabel);
+        financePanel.add(customerIdField);
+        financePanel.add(okButton);
+
+        financeWindow.add(financePanel);
+        financeWindow.setVisible(true);
+    }
+
+    private void showApprovalMessage(int customerId) {
+        String customerName = getCustomerNameById(customerId); // You need to implement this method
+        JOptionPane.showMessageDialog(null, "Finance approved for Customer ID: " + customerId + " and Name: " + customerName);
+    }
+
+    private void openReportWindow() {
+        JFrame reportFrame = new JFrame("Transaction Report");
+        reportFrame.setSize(800, 600);
+        reportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        // Call the transaction service to get all transactions
+        List<Transaction> transactions = transactionController.getAllTransactions();
+
+        // Create a panel to hold the table and total amount
+        JPanel reportPanel = new JPanel();
+        reportPanel.setLayout(new BorderLayout());
+
+        // Create a table to display transactions
+        String[] columnNames = {"Transaction ID", "Customer ID", "Transaction Date", "Total Amount", "Status"};
+        Object[][] data = new Object[transactions.size()][5];
+        double totalAmount = 0.0;
+
+        for (int i = 0; i < transactions.size(); i++) {
+            Transaction transaction = transactions.get(i);
+            data[i][0] = transaction.getTransactionId();
+            data[i][1] = transaction.getCustomerId();
+            data[i][2] = transaction.getTransactionDate();
+            data[i][3] = transaction.getTotalAmount();
+            data[i][4] = transaction.getStatus();
+
+            // Accumulate the total amount
+            totalAmount += transaction.getTotalAmount();
+        }
+
+        JTable table = new JTable(data, columnNames);
+        JScrollPane scrollPane = new JScrollPane(table);
+        reportPanel.add(scrollPane, BorderLayout.CENTER);
+
+        // Display the total amount below the table
+        JLabel totalLabel = new JLabel("Transactions Total: " + totalAmount);
+        reportPanel.add(totalLabel, BorderLayout.SOUTH);
+
+        reportFrame.add(reportPanel);
+        reportFrame.setVisible(true);
+    }
 
 
     private void handleLogout() {
@@ -408,6 +502,7 @@ public class DEStoreSwingGUI {
         LoyaltyCardDAO loyaltyCardDAO = new LoyaltyCardDAO();
         CustomerDAO customerDAO = new CustomerDAO(); //
         CustomerService customerService = new CustomerService(customerDAO);
+        TransactionDAO transactionDAO = new TransactionDAO();
 
 
 
@@ -417,8 +512,9 @@ public class DEStoreSwingGUI {
         InventoryService inventoryService = new InventoryService(productDAO, inventoryDAO, managerDAO);
         InventoryController inventoryController = new InventoryController(inventoryService);
         LoyaltyCardController loyaltyCardController = new LoyaltyCardController(loyaltyCardDAO);
+        TransactionController transactionController = new TransactionController(transactionDAO);
 
 
-        SwingUtilities.invokeLater(() -> new DEStoreSwingGUI(priceControlController, inventoryController, customerService, loyaltyCardController));
+        SwingUtilities.invokeLater(() -> new DEStoreSwingGUI(priceControlController, inventoryController, customerService, loyaltyCardController, transactionController));
     }
 }
